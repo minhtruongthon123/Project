@@ -1,0 +1,224 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/style.scss to edit this template
+*/
+/*
+    Created on : Mar 18, 2024, 9:17:14 PM
+    Author     : minhn
+*/
+
+/* == Các kiểu cơ bản */
+* {
+  box-sizing : border-box;
+  margin     : 0;
+  padding    : 0;
+}
+
+/* == Nhập Susy */
+@import "susy";
+
+/* Cài đặt Susy (cơ bản) */
+$susy: (
+  columns: 12,
+  gutters: 0,
+  global-box-sizing: border-box
+);
+
+/* Các điểm ngắt cho mq */
+$mq-base-font-size: 16px !default;
+$mq-responsive: true !default;
+$mq-breakpoints: (
+    mobile:  320px,
+    tablet:  740px,
+    desktop: 980px,
+    wide:    1300px
+) !default;
+$mq-static-breakpoint: desktop !default;
+$mq-show-breakpoints: () !default;
+$mq-media-type: all !default;
+
+/* Chuyển đổi từ px sang em */
+@function mq-px2em($px, $base-font-size: $mq-base-font-size) {
+    @if unitless($px) {
+        @warn "Giả định #{$px} là trong đơn vị pixels, cố gắng chuyển đổi nó sang pixels.";
+        @return mq-px2em($px * 1px, $base-font-size);
+    } @else if unit($px) == em {
+        @return $px;
+    }
+    @return ($px / $base-font-size) * 1em;
+}
+
+/* Lấy chiều rộng của điểm ngắt */
+@function mq-get-breakpoint-width($name, $breakpoints: $mq-breakpoints) {
+    @if map-has-key($breakpoints, $name) {
+        @return map-get($breakpoints, $name);
+    } @else {
+        @warn "Điểm ngắt #{$name} không được tìm thấy trong $breakpoints.";
+    }
+}
+
+/* Mở rộng phương thức truy vấn phương thức mixin */
+@mixin mq(
+    $from: false,
+    $until: false,
+    $and: false,
+    $media-type: $mq-media-type,
+    $breakpoints: $mq-breakpoints,
+    $responsive: $mq-responsive,
+    $static-breakpoint: $mq-static-breakpoint
+) {
+    $min-width: 0;
+    $max-width: 0;
+    $media-query: '';
+    
+    @if $from {
+        @if type-of($from) == number {
+            $min-width: mq-px2em($from);
+        } @else {
+            $min-width: mq-px2em(mq-get-breakpoint-width($from, $breakpoints));
+        }
+    }
+
+    @if $until {
+        @if type-of($until) == number {
+            $max-width: mq-px2em($until);
+        } @else {
+            $max-width: mq-px2em(mq-get-breakpoint-width($until, $breakpoints)) - .01em;
+        }
+    }
+
+    @if $responsive == false {
+        $static-breakpoint-width: mq-get-breakpoint-width($static-breakpoint, $breakpoints);
+        $target-width: mq-px2em($static-breakpoint-width);
+
+        @if (
+            $and == false
+            and $min-width <= $target-width
+            and (
+                $until == false or $max-width >= $target-width
+            )
+        ) {
+            @content;
+        }
+    }
+
+    @else {
+        @if $min-width != 0 { $media-query: '#{$media-query} and (min-width: #{$min-width})'; }
+        @if $max-width != 0 { $media-query: '#{$media-query} and (max-width: #{$max-width})'; }
+        @if $and            { $media-query: '#{$media-query} and #{$and}'; }
+
+        @if ($media-type == 'all' and $media-query != '') {
+            $media-type: '';
+            $media-query: str-slice(unquote($media-query), 6);
+        }
+
+        @media #{$media-type + $media-query} {
+            @content;
+        }
+    }
+}
+
+/* Thêm một điểm ngắt */
+@mixin mq-add-breakpoint($name, $width) {
+    $new-breakpoint: ($name: $width);
+    $mq-breakpoints: map-merge($mq-breakpoints, $new-breakpoint) !global;
+}
+
+/* Hiển thị các điểm ngắt */
+@mixin mq-show-breakpoints($show-breakpoints: $mq-show-breakpoints, $breakpoints: $mq-breakpoints) {
+    body:before {
+        background-color: #FCF8E3;
+        border-bottom: 1px solid #FBEED5;
+        border-left: 1px solid #FBEED5;
+        color: #C09853;
+        font: small-caption;
+        padding: 3px 6px;
+        pointer-events: none;
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 100;
+
+        @each $show-breakpoint in $show-breakpoints {
+            $width: mq-get-breakpoint-width($show-breakpoint, $breakpoints);
+            @include mq($show-breakpoint, $breakpoints: $breakpoints) {
+                content: "#{$show-breakpoint} ≥ #{$width} (#{mq-px2em($width)})";
+            }
+        }
+    }
+}
+
+/* Phong cách tạm thời cho việc phát triển */
+li {
+  border: 1px solid red;
+  list-style-type: none;
+}
+
+/* == Bảng thời gian */
+.timetable {
+  height: 100%;
+  width: 100vw;
+  padding: 1em;   //$temp style for testing
+  background: grey;
+}
+
+.week {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-content: space-between;
+  align-items: stretch;
+  border: 1px solid black; /* $temp style just for testing */
+  padding: 1em;
+  
+  .day-title {
+    background-color: tomato;
+    padding: .2em 0;
+    text-align: center;
+  }
+  
+  li {
+    order: 0;
+    flex: 0 1 auto;
+    align-self: auto;
+    width: span(12);
+    padding: 1em;
+    
+    @include mq($from: tablet) {
+       width: span(1.7)
+    }
+  }
+  
+  .activities-container {
+    background-color: white;
+    padding: .2em;
+  }
+  
+  .activity {
+    /* border: 1px solid black; $temp style for testing */
+    margin: 1em 0;
+    
+    header,
+    p {
+       background-color: rgba(211 ,120 ,193 , 70%);
+    }
+    
+    p {
+       background-color: rgba(211 ,120 ,193 , 70%);
+    }
+  }
+} /* Kết thúc .week */
+
+.activities-container {   /* $temp:   flexbox should be refactored with the .week ( duplicated styles) */
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-content: space-between;
+  align-items: stretch;
+  
+  .activity {
+    width: span(12);
+  }
+}

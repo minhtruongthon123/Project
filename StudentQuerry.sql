@@ -1,0 +1,1 @@
+select st.ID, st.Name,st.Email,st.Phone from Teacher st inner join Account ac on (st.Email=ac.Username) where ac.Username='tuanvm2@gmail.com'
