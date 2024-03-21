@@ -8,6 +8,7 @@ import Model.Group;
 import Model.Manager;
 import Model.Student;
 import Model.Teacher;
+import Model.User;
 import dal.GroupDAO;
 import dal.StudentDAO;
 import java.io.IOException;
@@ -68,47 +69,46 @@ public class ManagerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        PrintWriter out = response.getWriter();
-        Student student = (Student) session.getAttribute("student");
-        Teacher tc = (Teacher) session.getAttribute("teacher");
-        if (tc == null && student != null) {
-            request.getRequestDispatcher("studenthome.jsp").forward(request, response);
-        }
-        if (student == null && tc == null) {
-            request.getRequestDispatcher("/login").forward(request, response);
-
-        }
-        String search = request.getParameter("search");
-        List<Student> listStudent = new ArrayList<>();
-        StudentDAO studentDAO = new StudentDAO();
-        GroupDAO groupDAO = new GroupDAO();
-        List<Group> listGroup = new ArrayList<>();
-        List<Manager> listManager = new ArrayList<>();
-        if (search != null) {
-            try {
-                listStudent = studentDAO.searchStudent(search);
-                for (Student i : listStudent) {
-                    listGroup = groupDAO.getAllGroupbyStudentID(i.getId());
-                    listManager.add(new Manager(i, listGroup));
+        User u = (User) session.getAttribute("u");
+        if (u != null && u.getRole() == 2) {
+            String search = request.getParameter("search");
+            List<Student> listStudent = new ArrayList<>();
+            StudentDAO studentDAO = new StudentDAO();
+            GroupDAO groupDAO = new GroupDAO();
+            List<Group> listGroup = new ArrayList<>();
+            List<Manager> listManager = new ArrayList<>();
+            if (search != null) {
+                try {
+                    listStudent = studentDAO.searchStudent(search);
+                    for (Student i : listStudent) {
+                        listGroup = groupDAO.getAllGroupbyStudentID(i.getId());
+                        listManager.add(new Manager(i, listGroup));
+                    }
+                    request.setAttribute("listManager", listManager);
+                    request.getRequestDispatcher("StudentManager.jsp").forward(request, response);
+                } catch (SQLException | ClassNotFoundException ex) {
+                    Logger.getLogger(ManagerServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                request.setAttribute("listManager", listManager);
+            } else {
+                try {
+                    listStudent = studentDAO.searchStudent("");
+                    for (Student i : listStudent) {
+                        listGroup = groupDAO.getAllGroupbyStudentID(i.getId());
+                        listManager.add(new Manager(i, listGroup));
+                    }
+                    request.setAttribute("listManager", listManager);
+                } catch (SQLException | ClassNotFoundException ex) {
+                    Logger.getLogger(ManagerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                request.setAttribute("listStudent", listStudent);
                 request.getRequestDispatcher("StudentManager.jsp").forward(request, response);
-            } catch (SQLException | ClassNotFoundException ex) {
-                Logger.getLogger(ManagerServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } else {
-            try {
-                listStudent = studentDAO.searchStudent("");
-                for (Student i : listStudent) {
-                    listGroup = groupDAO.getAllGroupbyStudentID(i.getId());
-                    listManager.add(new Manager(i, listGroup));
-                }
-                request.setAttribute("listManager", listManager);
-            } catch (SQLException | ClassNotFoundException ex) {
-                Logger.getLogger(ManagerServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            request.setAttribute("listStudent", listStudent);
-            request.getRequestDispatcher("StudentManager.jsp").forward(request, response);
+        } else if (u != null && u.getRole() == 1) {
+            request.getRequestDispatcher("studenthome.jsp").forward(request, response);
+        } else if (u != null && u.getRole() == 3) {
+            request.getRequestDispatcher("Adminhome.jsp").forward(request, response);
+        } else if(u==null) {
+            request.getRequestDispatcher("/login").forward(request, response);
         }
 
     }

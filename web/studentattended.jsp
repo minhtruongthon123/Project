@@ -19,12 +19,12 @@
     <body>
         <div class="header" >
             <ul class="navbar__left">
-                <li class="navbar__left__link col-md-2"><a href="/project1/student">Home</a></li>
+                <li class="navbar__left__link col-md-2"><a href="/project1/studenthome.jsp">Home</a></li>
                 <li class="navbar__left__link col-md-2"><a href="/project1/weeklytime">Weekly Timetable</a></li>
                 <li class="navbar__left__link col-md-2"><a href="/project1/subjecttime">Subject Timetable</a></li>
                 <li class="navbar__left__link col-md-2"><a href="/project1/attendance">Attended Report</a></li>
                 <li class="navbar__left__link col-md-2"><a href="#contact">Exam Schedule</a></li>
-                <li class="navbar__left__link col-md-2"><a href="/project1/studentabout">About</a></li>
+                <li class="navbar__left__link col-md-2"><a href="/project1/studentabout.jsp">About</a></li>
             </ul>
         </div>
         <br> <br>

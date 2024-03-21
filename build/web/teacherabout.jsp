@@ -104,12 +104,12 @@
 <body>
     <div class="header" >
         <ul class="navbar__left">
-            <li class="navbar__left__link col-md-2"><a href="/project1/student">Home</a></li>
-            <li class="navbar__left__link col-md-2"><a href="/project1/weeklytime">Weekly Timetable</a></li>
-            <li class="navbar__left__link col-md-2"><a href="/project1/subjecttime">Subject Timetable</a></li>
-            <li class="navbar__left__link col-md-2"><a href="/project1/attendance">Attended Report</a></li>
-            <li class="navbar__left__link col-md-2"><a href="#contact">Exam Schedule</a></li>
-            <li class="navbar__left__link col-md-2"><a href="#">About</a></li>
+            <li class="navbar__left__link col-md-2"><a href="/project1/teacherhome.jsp">Home</a></li>
+            <li class="navbar__left__link col-md-2"><a href="/project1/teaching">Teaching schedule</a></li>
+            <li class="navbar__left__link col-md-2"><a href="/project1/teacherattendace">Attended</a></li>
+            <li class="navbar__left__link col-md-2"><a href="/project1/report">Attended Report</a></li>
+            <li class="navbar__left__link col-md-2"><a href="/project1/manager">Student</a></li>
+            <li class="navbar__left__link col-md-2"><a href="/project1/teacherabout.jsp">About</a></li>
         </ul>
     </div>
     <div class="user-info-container">
@@ -121,8 +121,8 @@
         <div class="user-details">
             <p>Email: ${sessionScope.teacher.getEmail()}</p>
             <p>ID: ${sessionScope.teacher.getId()}</p>
-            <p>Passwork:******** <a href="/project1/change">Change passwork</a></p>
-            <p>ID: ${sessionScope.teacher.getPhone()}</p>            
+            <p>Password:******** <a href="change?type=password">Change password</a></p>
+            <p>Phone: ${sessionScope.teacher.getPhone()} <a href="change?type=phone">Change phone</a></p>            
             <p><a href="/project1/logout">Log Out</a></p>
         </div>
     </div>

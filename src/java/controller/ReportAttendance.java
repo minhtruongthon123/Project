@@ -8,9 +8,11 @@ import Model.Attendance;
 import Model.Group;
 import Model.Student;
 import Model.Teacher;
+import Model.User;
 import dal.AttendanceDAO;
 import dal.GroupDAO;
 import dal.StudentDAO;
+import dal.TeacherDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -69,57 +71,57 @@ public class ReportAttendance extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Student student = (Student) session.getAttribute("student");
-        Teacher tc = (Teacher) session.getAttribute("teacher");
-        if (tc == null && student != null) {
-            request.getRequestDispatcher("studenthome.jsp").forward(request, response);
-        }
-        if (student == null && tc == null) {
-            request.getRequestDispatcher("/login").forward(request, response);
-
-        }
-        String group = request.getParameter("group");
-        AttendanceDAO AttendanceDAO = new AttendanceDAO();
-        List<Attendance> listAttendance = new ArrayList<>();
-        GroupDAO groupDAO = new GroupDAO();
-        List<Group> listGroup = new ArrayList<>();
-        StudentDAO studentDAO = new StudentDAO();
-        List<String> listStudent = new ArrayList<>();
-        List<String> listID = new ArrayList<>();
-        List<Integer> list = new ArrayList<>();
-        List<List<Integer>> listPresent = new ArrayList<>();
-        try {
-
-            listGroup = groupDAO.getAllGroupbyTeacherID(tc.getId());
-
-            //
-
-        } catch (SQLException ex) {
-            Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (group == null) {
-            request.setAttribute("listGroup", listGroup);
-            request.getRequestDispatcher("ReportAttendance.jsp").forward(request, response);
-        } else {
+        User u = (User) session.getAttribute("u");
+        if (u != null && u.getRole() == 2) {
+            String group = request.getParameter("group");
+            AttendanceDAO AttendanceDAO = new AttendanceDAO();
+            List<Attendance> listAttendance = new ArrayList<>();
+            GroupDAO groupDAO = new GroupDAO();
+            List<Group> listGroup = new ArrayList<>();
+            StudentDAO studentDAO = new StudentDAO();
+            TeacherDAO teacherDAO = new TeacherDAO();
+            Teacher tc = null;
+            List<String> listStudent = new ArrayList<>();
+            List<String> listID = new ArrayList<>();
+            List<Integer> list = new ArrayList<>();
+            List<List<Integer>> listPresent = new ArrayList<>();
             try {
-                listAttendance = AttendanceDAO.getAttendancebyTeacher(tc.getId(), Integer.parseInt(group));
-                listStudent = studentDAO.getAllStudentinClass(Integer.parseInt(group));
-                listID = studentDAO.getAllStudentID(Integer.parseInt(group));
-                for (String string : listID) {
-                    list=AttendanceDAO.getAttendancebyStudentID(string, Integer.parseInt(group));
-                    listPresent.add(list);
-                }
-                request.setAttribute("listPresent", listPresent);
-                request.setAttribute("listAttendance", listAttendance);
-                request.setAttribute("listGroup", listGroup);
-                request.setAttribute("listStudent", listStudent);
-                request.setAttribute("listID", listID);
-                request.getRequestDispatcher("ReportAttendance.jsp").forward(request, response);
-            } catch (SQLException | ClassNotFoundException ex) {
-                Logger.getLogger(ReportAttendance.class.getName()).log(Level.SEVERE, null, ex);
+                tc=teacherDAO.TeacherInfo(u.getUsername());
+                listGroup = groupDAO.getAllGroupbyTeacherID(tc.getId());
+            } catch (SQLException ex) {
+                Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
+            if (group == null) {
+                request.setAttribute("listGroup", listGroup);
+                request.getRequestDispatcher("ReportAttendance.jsp").forward(request, response);
+            } else {
+                try {
+                    tc=teacherDAO.TeacherInfo(u.getUsername());
+                    listAttendance = AttendanceDAO.getAttendancebyTeacher(tc.getId(), Integer.parseInt(group));
+                    listStudent = studentDAO.getAllStudentinClass(Integer.parseInt(group));
+                    listID = studentDAO.getAllStudentID(Integer.parseInt(group));
+                    for (String string : listID) {
+                        list = AttendanceDAO.getAttendancebyStudentID(string, Integer.parseInt(group));
+                        listPresent.add(list);
+                    }
+                    request.setAttribute("listPresent", listPresent);
+                    request.setAttribute("listAttendance", listAttendance);
+                    request.setAttribute("listGroup", listGroup);
+                    request.setAttribute("listStudent", listStudent);
+                    request.setAttribute("listID", listID);
+                    request.getRequestDispatcher("ReportAttendance.jsp").forward(request, response);
+                } catch (SQLException | ClassNotFoundException ex) {
+                    Logger.getLogger(ReportAttendance.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } else if (u != null && u.getRole() == 2) {
+            request.getRequestDispatcher("teacherhome.jsp").forward(request, response);
+        } else if (u != null && u.getRole() == 3) {
+            request.getRequestDispatcher("Adminhome.jsp").forward(request, response);
+        } else if(u==null) {
+            request.getRequestDispatcher("/login").forward(request, response);
         }
     }
 

@@ -40,6 +40,10 @@
         <servlet-name>RemoveServlet</servlet-name>
         <servlet-class>controller.RemoveServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ChangeServlet</servlet-name>
+        <servlet-class>controller.ChangeServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>UserServlet</servlet-name>
         <url-pattern>/user</url-pattern>
@@ -79,6 +83,10 @@
     <servlet-mapping>
         <servlet-name>RemoveServlet</servlet-name>
         <url-pattern>/remove</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChangeServlet</servlet-name>
+        <url-pattern>/change</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>login.jsp</welcome-file>

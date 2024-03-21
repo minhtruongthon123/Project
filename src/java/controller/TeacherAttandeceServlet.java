@@ -6,11 +6,15 @@ package controller;
 
 import Model.Attendance;
 import Model.Group;
+import Model.Schedule;
 import Model.Student;
 import Model.Teacher;
+import Model.User;
 import dal.AttendanceDAO;
 import dal.GroupDAO;
+import dal.ScheduleDAO;
 import dal.StudentDAO;
+import dal.TeacherDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -20,6 +24,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,64 +75,72 @@ public class TeacherAttandeceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Student student = (Student) session.getAttribute("student");
-        Teacher tc = (Teacher) session.getAttribute("teacher");
-        if (tc == null && student != null) {
-            request.getRequestDispatcher("studenthome.jsp").forward(request, response);
-        }
-        if (student == null && tc == null) {
-            request.getRequestDispatcher("/login").forward(request, response);
+        User u = (User) session.getAttribute("u");
+        if (u != null && u.getRole() == 2) {
+            String group = request.getParameter("group");
+            String scheduleID = request.getParameter("scheduleID");
+            AttendanceDAO AttendanceDAO = new AttendanceDAO();
+            List<Attendance> listAttendance = new ArrayList<>();
+            GroupDAO groupDAO = new GroupDAO();
+            List<Group> listGroup = new ArrayList<>();
+            StudentDAO studentDAO = new StudentDAO();
+            TeacherDAO teacherDAO= new TeacherDAO();
+            Teacher tc = null;
+            try {
+                tc = teacherDAO.TeacherInfo(u.getUsername());
+            } catch (SQLException | ClassNotFoundException ex) {
+                Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+;
+            List<String> listStudent = new ArrayList<>();
+            List<String> listID = new ArrayList<>();
+            if (group != null) {
+                if (scheduleID == null) {
+                    try {
+                        listAttendance = AttendanceDAO.getAttendancebyTeacher(tc.getId(), Integer.parseInt(group));
+                        listGroup = groupDAO.getAllGroupbyTeacherID(tc.getId());
+                        request.setAttribute("listAttendance", listAttendance);
+                        request.setAttribute("listGroup", listGroup);
+                        request.setAttribute("group", group);
+                        request.getRequestDispatcher("teacherattendance.jsp").forward(request, response);
+                    } catch (SQLException | ClassNotFoundException ex) {
+                        Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                    try {
+                        listAttendance = AttendanceDAO.getAttendancebyTeacher(tc.getId(), Integer.parseInt(group));
+                        listGroup = groupDAO.getAllGroupbyTeacherID(tc.getId());
+                        listStudent = studentDAO.getAllStudentinClass(Integer.parseInt(group));
+                        listID = studentDAO.getAllStudentID(Integer.parseInt(group));
+                        request.setAttribute("listAttendance", listAttendance);
+                        request.setAttribute("listGroup", listGroup);
+                        request.setAttribute("listStudent", listStudent);
+                        request.setAttribute("listID", listID);
+                        request.setAttribute("group", group);
+                        request.setAttribute("scheduleID", scheduleID);
+                        request.getRequestDispatcher("teacherattendance.jsp").forward(request, response);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
+                    }
 
-        }
-        String group = request.getParameter("group");
-        String scheduleID = request.getParameter("scheduleID");
-        AttendanceDAO AttendanceDAO = new AttendanceDAO();
-        List<Attendance> listAttendance = new ArrayList<>();
-        GroupDAO groupDAO = new GroupDAO();
-        List<Group> listGroup = new ArrayList<>();
-        StudentDAO studentDAO = new StudentDAO();
-        List<String> listStudent = new ArrayList<>();
-        List<String> listID = new ArrayList<>();
-        if (group != null) {
-            if (scheduleID == null) {
+                }
+            } else {
                 try {
-                    listAttendance = AttendanceDAO.getAttendancebyTeacher(tc.getId(), Integer.parseInt(group));
                     listGroup = groupDAO.getAllGroupbyTeacherID(tc.getId());
-                    request.setAttribute("listAttendance", listAttendance);
                     request.setAttribute("listGroup", listGroup);
-                    request.setAttribute("group", group);
                     request.getRequestDispatcher("teacherattendance.jsp").forward(request, response);
                 } catch (SQLException | ClassNotFoundException ex) {
                     Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } else {
-                try {
-                    listAttendance = AttendanceDAO.getAttendancebyTeacher(tc.getId(), Integer.parseInt(group));
-                    listGroup = groupDAO.getAllGroupbyTeacherID(tc.getId());
-                    listStudent = studentDAO.getAllStudentinClass(Integer.parseInt(group));
-                    listID = studentDAO.getAllStudentID(Integer.parseInt(group));
-                    request.setAttribute("listAttendance", listAttendance);
-                    request.setAttribute("listGroup", listGroup);
-                    request.setAttribute("listStudent", listStudent);
-                    request.setAttribute("listID", listID);
-                    request.setAttribute("group", group);
-                    request.setAttribute("scheduleID", scheduleID);
-                    request.getRequestDispatcher("teacherattendance.jsp").forward(request, response);
-                } catch (SQLException ex) {
-                    Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
             }
-        } else {
-            try {
-                listGroup = groupDAO.getAllGroupbyTeacherID(tc.getId());
-                request.setAttribute("listGroup", listGroup);
-                request.getRequestDispatcher("teacherattendance.jsp").forward(request, response);
-            } catch (SQLException | ClassNotFoundException ex) {
-                Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        } else if (u != null && u.getRole() == 1) {
+            request.getRequestDispatcher("studenthome.jsp").forward(request, response);
+        } else if (u != null && u.getRole() == 3) {
+            request.getRequestDispatcher("Adminhome.jsp").forward(request, response);
+        } else if(u==null) {
+            request.getRequestDispatcher("/login").forward(request, response);
         }
 
     }
@@ -142,38 +156,49 @@ public class TeacherAttandeceServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String scheduleID = request.getParameter("scheduleID");
-        int size = Integer.parseInt(request.getParameter("size"));
-        int ID = 0;
-        // Khai báo một mảng để lưu trữ giá trị của listID
-        String[] listID = new String[size];
-        String[] listPresent = new String[size];
-        String[] listComment = new String[size];
-        int[] present = new int[size];
-        AttendanceDAO attendanceDAO = new AttendanceDAO();
-        // Lặp qua các chỉ số để lấy giá trị của từng trường listID[index]
-        for (int i = 0; i < size; i++) {
-            listID[i] = request.getParameter("listID" + i);
-            listPresent[i] = request.getParameter("present" + i);
-            listComment[i] = request.getParameter("comment" + i);
-        }
-        try{
+        HttpSession session = request.getSession();
+        User u = (User) session.getAttribute("u");
+        if (u != null & u.getRole() == 2) {
+            String scheduleID = request.getParameter("scheduleID");
+            int size = Integer.parseInt(request.getParameter("size"));
+            int ID = 0;
+            // Khai báo một mảng để lưu trữ giá trị của listID
+            String[] listID = new String[size];
+            String[] listPresent = new String[size];
+            String[] listComment = new String[size];
+            int[] present = new int[size];
+            AttendanceDAO attendanceDAO = new AttendanceDAO();
+            // Lặp qua các chỉ số để lấy giá trị của từng trường listID[index]
             for (int i = 0; i < size; i++) {
-                present[i]=Integer.parseInt(listPresent[i]);
+                listID[i] = request.getParameter("listID" + i);
+                listPresent[i] = request.getParameter("present" + i);
+                listComment[i] = request.getParameter("comment" + i);
             }
-            ID=Integer.parseInt(scheduleID);
-            
-            response.sendRedirect(request.getContextPath() + "/teacherattendace");
-        }catch(NumberFormatException e){
-            
-        }
-        for (int i = 0; i < size; i++) {
             try {
-                attendanceDAO.takeAttendance(ID, listID[i], present[i], listComment[i]);
-            } catch (SQLException | ClassNotFoundException ex) {
-                Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
+                for (int i = 0; i < size; i++) {
+                    present[i] = Integer.parseInt(listPresent[i]);
+                }
+                ID = Integer.parseInt(scheduleID);
+
+                response.sendRedirect(request.getContextPath() + "/teacherattendace");
+            } catch (NumberFormatException e) {
+
             }
+            for (int i = 0; i < size; i++) {
+                try {
+                    attendanceDAO.takeAttendance(ID, listID[i], present[i], listComment[i]);
+                } catch (SQLException | ClassNotFoundException ex) {
+                    Logger.getLogger(TeacherAttandeceServlet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        } else if (u != null && u.getRole() == 2) {
+            request.getRequestDispatcher("teacherhome.jsp").forward(request, response);
+        } else if (u != null && u.getRole() == 3) {
+            request.getRequestDispatcher("Adminhome.jsp").forward(request, response);
+        } else {
+            request.getRequestDispatcher("/login").forward(request, response);
         }
+
     }
 
     /**

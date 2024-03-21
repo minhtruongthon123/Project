@@ -79,7 +79,7 @@ public class StudentDAO {
         try {
             sql = sql + "'%" + search + "%'";
             PreparedStatement st = db.connection.prepareStatement(sql);
-            
+
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
                 listStudent.add(new Student(rs.getString("ID"), rs.getString("Name"), rs.getString("Dob"), rs.getString("Email"), rs.getBoolean("Gender"), rs.getString("Phone")));
@@ -90,6 +90,7 @@ public class StudentDAO {
         }
         return null;
     }
+
     public static void main(String[] args) {
         // Gọi hàm StudentInfo để lấy thông tin sinh viên từ cơ sở dữ liệu
         List<String> list = new ArrayList<>();
@@ -98,14 +99,29 @@ public class StudentDAO {
             StudentDAO studentDAO = new StudentDAO();
             String usernameToSearch = "minhndhe160497@gmail.com"; // Replace with the actual username
             Student student = studentDAO.StudentInfo(usernameToSearch);
-            list2=studentDAO.searchStudent("Minh");
+            list2 = studentDAO.searchStudent("Minh");
             list = studentDAO.getAllStudentID(11);
-            
+
             for (Student student1 : list2) {
                 System.out.println(student1.getName());
             }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace(); // Log or handle the exception
+        }
+    }
+
+    public void changePhone(String phone, Student student) throws SQLException, ClassNotFoundException {
+        DBContext db = new DBContext();
+        try {
+            String sql = "UPDATE Student\n"
+                    + "SET Phone = ?\n"
+                    + "WHERE Email=?";
+
+            PreparedStatement st = db.connection.prepareStatement(sql);
+            st.setString(1, phone); // Thiết lập mật khẩu mới
+            st.setString(2, student.getEmail());
+            int rs = st.executeUpdate();
+        } catch (SQLException e) {
         }
     }
 }

@@ -22,7 +22,7 @@
                 color: #444444;
             }
             .header{
-                background-color: rgba(26, 160, 218, 1);
+                background-color: #f36f21;
             }
             .container {
                 background-color: #ffffff;
@@ -64,7 +64,6 @@
                 justify-content: center;
                 width: 100%;
                 height: 50px;
-                background-color: rgba(26, 160, 218, 0.5);
                 margin: 0px;
                 padding: 0px;
             }
@@ -119,7 +118,7 @@
                 <li class="navbar__left__link col-md-2"><a href="/project1/subjecttime">Subject Timetable</a></li>
                 <li class="navbar__left__link col-md-2"><a href="/project1/attendance">Attended Report</a></li>
                 <li class="navbar__left__link col-md-2"><a href="#contact">Exam Schedule</a></li>
-                <li class="navbar__left__link col-md-2"><a href="/project1/studentabout">About</a></li>
+                <li class="navbar__left__link col-md-2"><a href="/project1/studentabout.jsp">About</a></li>
             </ul>
         </div>
         <div class="content">

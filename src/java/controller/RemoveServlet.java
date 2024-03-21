@@ -89,8 +89,7 @@ public class RemoveServlet extends HttpServlet {
             } catch (ClassNotFoundException | SQLException ex) {
                 Logger.getLogger(RemoveServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        
+        }        
     }
 
     /** 

@@ -7,6 +7,7 @@ package controller;
 import Model.Schedule;
 import Model.Student;
 import Model.Teacher;
+import Model.User;
 import dal.ScheduleDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -66,44 +67,44 @@ public class WeeklyTimeTableServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        Student student = (Student) session.getAttribute("student");
-        Teacher tc = (Teacher) session.getAttribute("teacher");
-        if (student == null && tc != null) {
-            request.getRequestDispatcher("teacherhome.jsp").forward(request, response);
-        }
-        if (student == null && tc == null) {
-            request.getRequestDispatcher("/login").forward(request, response);
-
-        }
-        String PageNumber = request.getParameter("page");
-        int page = 0;
-        if (PageNumber != null) {
-            try {
-                page = Integer.parseInt(PageNumber) - 1;
-            } catch (Exception e) {
-                System.out.println(e);
+        User u = (User) session.getAttribute("u");
+        if (u != null && u.getRole() == 1) {
+            String PageNumber = request.getParameter("page");
+            int page = 0;
+            if (PageNumber != null) {
+                try {
+                    page = Integer.parseInt(PageNumber) - 1;
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
             }
+            Student st = new Student();
+            List<Schedule> list = new ArrayList<>();
+            List<Schedule> listschedule = new ArrayList<>();
+            List<List<Schedule>> listbyweek = new ArrayList<>();
+            st = (Student) session.getAttribute("student");
+            ScheduleDAO scheduleDAO = new ScheduleDAO();
+            try {
+                list = scheduleDAO.getAllScheduleforStudent(st.getId());
+                listbyweek = scheduleDAO.getSchedulebyWeek(list);
+                listschedule = listbyweek.get(page);
+            } catch (SQLException ex) {
+                Logger.getLogger(WeeklyTimeTableServlet.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(WeeklyTimeTableServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            int NumberofPage = listbyweek.size();
+            request.setAttribute("page", page + 1);
+            request.setAttribute("numpage", NumberofPage);
+            request.setAttribute("list", listschedule);
+            request.getRequestDispatcher("weeklytimetable.jsp").forward(request, response);
+        } else if (u != null && u.getRole() == 2) {
+            request.getRequestDispatcher("teacherhome.jsp").forward(request, response);
+        } else if (u != null && u.getRole() == 3) {
+            request.getRequestDispatcher("Adminhome.jsp").forward(request, response);
+        } else if(u==null) {
+            request.getRequestDispatcher("/login").forward(request, response);
         }
-        Student st = new Student();
-        List<Schedule> list = new ArrayList<>();
-        List<Schedule> listschedule = new ArrayList<>();
-        List<List<Schedule>> listbyweek = new ArrayList<>();
-        st = (Student) session.getAttribute("student");
-        ScheduleDAO scheduleDAO = new ScheduleDAO();
-        try {
-            list = scheduleDAO.getAllScheduleforStudent(st.getId());
-            listbyweek = scheduleDAO.getSchedulebyWeek(list);
-            listschedule = listbyweek.get(page);
-        } catch (SQLException ex) {
-            Logger.getLogger(WeeklyTimeTableServlet.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(WeeklyTimeTableServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        int NumberofPage = listbyweek.size();
-        request.setAttribute("page", page + 1);
-        request.setAttribute("numpage", NumberofPage);
-        request.setAttribute("list", listschedule);
-        request.getRequestDispatcher("weeklytimetable.jsp").forward(request, response);
 
     }
 

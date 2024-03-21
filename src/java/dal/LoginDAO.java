@@ -40,10 +40,19 @@ public class LoginDAO  {
         
         return null;
     }
-    public static int convertDayOfWeekToNumber(String dayOfWeek) {
-        // Chuyển đổi ngày thứ sang số tương ứng
-        DayOfWeek day = DayOfWeek.valueOf(dayOfWeek.toUpperCase());
-        return day.getValue();
+    public void changePassword(String password, String UserName) throws SQLException, ClassNotFoundException {
+        DBContext db = new DBContext();
+        try {
+            String sql = "UPDATE Account\n"
+                    + "SET Password = ?\n"
+                    + "WHERE Username=?";
+
+            PreparedStatement st = db.connection.prepareStatement(sql);
+            st.setString(1, password); // Thiết lập mật khẩu mới
+            st.setString(2, UserName);
+            int rs = st.executeUpdate();
+        } catch (SQLException e) {
+        }
     }
 
     public static void main(String[] args) throws ClassNotFoundException, SQLException {

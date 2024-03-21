@@ -15,7 +15,7 @@
         <link rel="stylesheet" href="css/bootstrap-grid.min.css"/>
         <link rel="stylesheet" href="css/bootstrap.min.css"/>
         <link rel="stylesheet" href="css/styles.css"/>
-        <title>JSP Page</title>
+        <title>Report Attendance</title>
         <style>
             body {
                 background-color: #e2e2e2;
@@ -37,13 +37,6 @@
                 justify-content: center;
                 flex-direction: column;
                 margin: 0;
-                text-align: center;
-            }
-            h2 {
-                color: #F37022;
-                font-size: 60px;
-                font-weight: 700;
-                margin-bottom: 20px;
                 text-align: center;
             }
             input[type=submit]:hover {
@@ -110,24 +103,6 @@
                 color: black;
                 text-align: center;
             }
-            .student-info {
-                background-color: rgba(252,89,13,0.6);
-                flex: 1;
-                display: grid;
-            }
-
-            .student-info img {
-                width: 100px;
-                border-radius: 50%;
-                margin-right: 20px;
-                text-align: center;
-            }
-
-            .student-info h4 {
-                color: #444444;
-                text-align: center;
-                margin: auto;
-            }
             .content{
                 display: flex;
                 justify-content: space-between;
@@ -141,6 +116,7 @@
                 justify-content: space-between;
             }
             .page{
+                
                 align-items: center;
                 margin: 0 auto 20px;
                 flex-direction: column;
@@ -155,7 +131,9 @@
                 background-color:  rgba(255, 172, 142, 0.9);
                 color: black;
                 border-radius: 4px;
-                transition: background-color 0.3s;
+            }
+            .content{
+                background-color: white;
             }
         </style>
     </head>
@@ -170,14 +148,14 @@
                 <li class="navbar__left__link col-md-2"><a href="/project1/teacherabout.jsp">About</a></li>
             </ul>
             <div class="content">
-                <div class="page col-md-2">
+                <div class="page col-md-1">
                     <table>
                         <c:forEach var="i" items="${requestScope.listGroup}">
                             <tr><td><a style="text-decoration: none;color: black;" class="" href="report?group=${i.getID()}">${i.getName()}</a></td></tr>
                                 </c:forEach>
                     </table>
                 </div>
-                <div class="container col-md-10">
+                <div class="container col-md-11">
                     <c:set var="listID" value="${requestScope.listID}"></c:set>
                     <c:set var="listStudent" value="${requestScope.listStudent}"></c:set>
                     <c:set var="size" value="${listStudent.size()}"></c:set>
@@ -210,7 +188,7 @@
                                                             P
                                                         </c:when>
                                                         <c:when test="${i == 0}">
-                                                            ASB
+                                                            ABS
                                                         </c:when>
                                                         <c:otherwise>
                                                             F

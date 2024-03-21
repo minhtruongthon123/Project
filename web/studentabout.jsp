@@ -121,8 +121,8 @@
         <div class="user-details">
             <p>Email: ${sessionScope.student.getEmail()}</p>
             <p>ID: ${sessionScope.student.getId()}</p>
-            <p>Passwork:******** <a href="/project1/delete">Change passwork</a></p>
-            <p>ID: ${sessionScope.student.getPhone()}</p>            
+            <p>Password:******** <a href="change?type=password">Change password</a></p>
+            <p>Phone: ${sessionScope.student.getPhone()}<a href="change?type=phone">Change phone</a></p>            
             <p><a href="/project1/logout">Log Out</a></p>
         </div>
     </div>

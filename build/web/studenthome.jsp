@@ -17,7 +17,7 @@
             color: #444444;
         }
         .header{
-            background-color: rgba(26, 160, 218, 1);
+            background-color: #f36f21;
         }
         .container {
             background-color: #ffffff;
@@ -56,7 +56,6 @@
             justify-content: center;
             width: 100%;
             height: 50px;
-            background-color: rgba(26, 160, 218, 0.5);
             margin: 0px;
             padding: 0px;
         }

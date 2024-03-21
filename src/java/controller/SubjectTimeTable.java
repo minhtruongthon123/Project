@@ -8,6 +8,7 @@ import Model.Schedule;
 import Model.Student;
 import Model.Subject;
 import Model.Teacher;
+import Model.User;
 import dal.ScheduleDAO;
 import dal.SubjectDAO;
 import java.io.IOException;
@@ -69,56 +70,56 @@ public class SubjectTimeTable extends HttpServlet {
             throws ServletException, IOException {
         String[] subject = request.getParameterValues("subjectSelected");
         HttpSession session = request.getSession();
-        Student student = (Student) session.getAttribute("student");
-        Teacher tc = (Teacher) session.getAttribute("teacher");
-        if (student == null && tc != null) {
-            request.getRequestDispatcher("teacherhome.jsp").forward(request, response);
-        }
-        if (student == null && tc == null) {
-            request.getRequestDispatcher("/login").forward(request, response);
-
-        }
-        Student st = new Student();
-        List<Schedule> list = new ArrayList<>();
-        st = (Student) session.getAttribute("student");
-        List<Subject> listsubject = new ArrayList<>();
-        SubjectDAO sb= new SubjectDAO();
-        ScheduleDAO scheduleDAO = new ScheduleDAO();
-        if (subject != null) {
-            List<String> search = new ArrayList<>();
-        for (int i = 0; i < subject.length; i++) {
-            search.add(subject[i]);
-        }
-            try {
-                list = scheduleDAO.getScheduleforStudentbySubject(search, st.getId());
-                listsubject = sb.getSubjectbyStudentID(st.getId());
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(SubjectTimeTable.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(SubjectTimeTable.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            try {
-                list = scheduleDAO.getAllScheduleforStudent(st.getId());
-                listsubject = sb.getSubjectbyStudentID(st.getId());
-            } catch (SQLException ex) {
-                Logger.getLogger(SubjectTimeTable.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ClassNotFoundException ex) {
-                Logger.getLogger(SubjectTimeTable.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        boolean[] checked = new boolean[listsubject.size()];
-        for (int i = 0; i < checked.length; i++) {
-            if (isCheck(listsubject.get(i).getName(), subject)) {
-                checked[i] = true;
+        User u = (User) session.getAttribute("u");
+        if (u != null && u.getRole() == 1) {
+            Student st = new Student();
+            List<Schedule> list = new ArrayList<>();
+            st = (Student) session.getAttribute("student");
+            List<Subject> listsubject = new ArrayList<>();
+            SubjectDAO sb = new SubjectDAO();
+            ScheduleDAO scheduleDAO = new ScheduleDAO();
+            if (subject != null) {
+                List<String> search = new ArrayList<>();
+                for (int i = 0; i < subject.length; i++) {
+                    search.add(subject[i]);
+                }
+                try {
+                    list = scheduleDAO.getScheduleforStudentbySubject(search, st.getId());
+                    listsubject = sb.getSubjectbyStudentID(st.getId());
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(SubjectTimeTable.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                    Logger.getLogger(SubjectTimeTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } else {
-                checked[i] = false;
+                try {
+                    list = scheduleDAO.getAllScheduleforStudent(st.getId());
+                    listsubject = sb.getSubjectbyStudentID(st.getId());
+                } catch (SQLException ex) {
+                    Logger.getLogger(SubjectTimeTable.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(SubjectTimeTable.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
+            boolean[] checked = new boolean[listsubject.size()];
+            for (int i = 0; i < checked.length; i++) {
+                if (isCheck(listsubject.get(i).getName(), subject)) {
+                    checked[i] = true;
+                } else {
+                    checked[i] = false;
+                }
+            }
+            request.setAttribute("check", checked);
+            request.setAttribute("listsubject", listsubject);
+            request.setAttribute("list", list);
+            request.getRequestDispatcher("subjecttimetable.jsp").forward(request, response);
+        } else if (u != null && u.getRole() == 2) {
+            request.getRequestDispatcher("teacherhome.jsp").forward(request, response);
+        } else if (u != null && u.getRole() == 3) {
+            request.getRequestDispatcher("Adminhome.jsp").forward(request, response);
+        } else if(u==null) {
+            request.getRequestDispatcher("/login").forward(request, response);
         }
-        request.setAttribute("check", checked);
-        request.setAttribute("listsubject", listsubject);
-        request.setAttribute("list", list);
-        request.getRequestDispatcher("subjecttimetable.jsp").forward(request, response);
     }
 
     private boolean isCheck(String subjectName, String[] subject) {

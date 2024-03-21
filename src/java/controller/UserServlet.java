@@ -79,7 +79,7 @@ public class UserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
-        User u = (User) request.getAttribute("u");
+        User u = (User) session.getAttribute("u");
         TeacherDAO tc = new TeacherDAO();
         Teacher teacher;
         StudentDAO st = new StudentDAO();
@@ -93,7 +93,7 @@ public class UserServlet extends HttpServlet {
                 Logger.getLogger(UserServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-        } else {
+        } else  {
             try {
                 teacher = tc.TeacherInfo(u.getUsername());
                 session.setAttribute("teacher", teacher);

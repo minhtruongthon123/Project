@@ -64,26 +64,7 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //request.getRequestDispatcher("login.jsp").forward(request, response);
-
-        String op_raw = request.getParameter("op");
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        LoginDAO login = new LoginDAO();
-        User u = null;
-        try {
-            u = login.login(username, password);
-        } catch (ClassNotFoundException | SQLException ex) {
-            Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (u == null) {
-            request.setAttribute("error", "Username or password is invalid");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-        } else {
-            request.setAttribute("u", u);
-            request.getRequestDispatcher("/user").forward(request, response);
-        }
-
+        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 
     /**
@@ -96,8 +77,8 @@ public class LoginServlet extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        PrintWriter out = response.getWriter();
+            throws ServletException, IOException {        
+        HttpSession session = request.getSession();
         String op_raw = request.getParameter("op");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -109,12 +90,11 @@ public class LoginServlet extends HttpServlet {
             Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (u == null) {
-            out.print("Khong truyen duoc");
             request.setAttribute("error", "Username or password is invalid");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         } else {
             //out.print(u.getUsername()+u.getPassword());
-            request.setAttribute("u", u);
+            session.setAttribute("u", u);
             request.getRequestDispatcher("/user").forward(request, response);
         }
     }

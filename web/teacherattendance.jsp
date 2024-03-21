@@ -158,7 +158,7 @@
                 <li class="navbar__left__link col-md-2"><a href="/project1/teaching">Teaching schedule</a></li>
                 <li class="navbar__left__link col-md-2"><a href="/project1/teacherattendace">Attended</a></li>
                 <li class="navbar__left__link col-md-2"><a href="/project1/report">Attended Report</a></li>
-                <li class="navbar__left__link col-md-2"><a href="#contact">Student</a></li>
+                <li class="navbar__left__link col-md-2"><a href="/project1/manager">Student</a></li>
                 <li class="navbar__left__link col-md-2"><a href="/project1/teacherabout.jsp">About</a></li>
             </ul>
         </div>
