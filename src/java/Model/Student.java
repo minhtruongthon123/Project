@@ -12,7 +12,6 @@ public class Student {
     public String id,name,dob,email;
     public boolean gender;
     public String phone;
-
     public Student() {
     }
 

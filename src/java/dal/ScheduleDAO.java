@@ -190,6 +190,28 @@ public class ScheduleDAO {
         return subjectlist;
     }
 
+    public List<Integer> getScheduleIDbygroupID(int groupID) throws ClassNotFoundException, ClassNotFoundException {
+        List<Integer> ScheduleIDlist = new ArrayList<>();
+        String sql = "select sch.ID from Schedule sch\n"
+                + "inner join [dbo].[Group] g on g.ID=sch.GroupID where g.ID=?";
+
+        try {
+            DBContext db = new DBContext();
+            PreparedStatement st = db.connection.prepareStatement(sql);
+            st.setInt(1, groupID);
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                //Date sqldate = rs.getDate("Date");
+//                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+//                String date = dateFormat.format(sqldate);
+                ScheduleIDlist.add(rs.getInt(1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ScheduleIDlist;
+    }
+
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
 //        
         try {
@@ -197,17 +219,17 @@ public class ScheduleDAO {
             //List<Schedule> schedules = sch.getScheduleforStudentbySubject("PRF192", "HE160497");
             List<Schedule> schedules = sch.getAllScheduleforTeacher("thangnt44");
             Collections.sort(schedules, new Comparator<Schedule>() {
-            @Override
-            public int compare(Schedule fs1, Schedule fs2) {
-                // Đầu tiên so sánh ngày
-                int dateComparison = fs1.getDate().compareTo(fs2.getDate());
-                if (dateComparison != 0) {
-                    return dateComparison;
+                @Override
+                public int compare(Schedule fs1, Schedule fs2) {
+                    // Đầu tiên so sánh ngày
+                    int dateComparison = fs1.getDate().compareTo(fs2.getDate());
+                    if (dateComparison != 0) {
+                        return dateComparison;
+                    }
+                    // Nếu ngày giống nhau, thì so sánh thời gian bắt đầu
+                    return fs1.getTimeStart().compareTo(fs2.getTimeStart());
                 }
-                // Nếu ngày giống nhau, thì so sánh thời gian bắt đầu
-                return fs1.getTimeStart().compareTo(fs2.getTimeStart());
-            }
-        });
+            });
             if (!schedules.isEmpty()) {
                 System.out.println("Danh sách lịch ban đầu:");
                 for (Schedule schedule : schedules) {
